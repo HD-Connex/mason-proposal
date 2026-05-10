@@ -90,20 +90,7 @@ function getTimeline(bundleSelected, selectedPackages, selectedAddons) {
 function HDLogo({ dark = false }) {
   return (
     <div style={{ userSelect: "none" }}>
-      <svg width="160" height="52" viewBox="0 0 160 52" xmlns="http://www.w3.org/2000/svg">
-        <rect x="4" y="6" width="7" height="30" rx="2" fill="#F97316" />
-        <rect x="4" y="18" width="18" height="7" rx="1" fill="#F97316" />
-        <rect x="15" y="6" width="7" height="30" rx="2" fill="#F97316" />
-        <rect x="28" y="6" width="7" height="30" rx="2" fill="#F97316" />
-        <path d="M35 6 Q56 6 56 21 Q56 36 35 36 Z" fill="none" stroke="#F97316" strokeWidth="5" strokeLinejoin="round" />
-        <path d="M38 9 Q60 9 60 21 Q60 33 38 33" fill="none" stroke="#22D3EE" strokeWidth="2.5" strokeLinecap="round" opacity="0.9" />
-        <circle cx="38" cy="9" r="2.5" fill="#22D3EE" />
-        <circle cx="60" cy="21" r="3" fill="#F97316" />
-        <circle cx="38" cy="33" r="2.5" fill="#22D3EE" />
-        <text x="70" y="26" fontFamily="'Georgia', serif" fontWeight="900" fontSize="18" fill="#F97316" letterSpacing="-0.5">HD</text>
-        <text x="91" y="26" fontFamily="'Georgia', serif" fontWeight="700" fontSize="18" fill={dark ? "#E0E0F0" : "#1A1A2E"} letterSpacing="-0.3"> CONNEX</text>
-        <text x="70" y="38" fontFamily="monospace" fontSize="6.5" fill={dark ? "#8080A0" : "#9090A8"} letterSpacing="1.2">COGNITIVE ARCHITECTURE &amp; INTELLIGENCE</text>
-      </svg>
+      <img src="https://plain-enam-prod-public.komododecks.com/202605/10/eKfzaqKNPzMmXUv3tQCH/image.png" alt="HD Connex" style={{ height: 52 }} />
     </div>
   );
 }
@@ -198,7 +185,7 @@ function AddonCard({ addon, selected, onToggle }) {
 }
 
 function SectionHeader({ children }) {
-  return <div style={{ fontSize: 10, letterSpacing: "0.16em", color: "#F97316", fontFamily: "monospace", marginBottom: 16, paddingBottom: 9, borderBottom: "1px solid #E8E4DF", fontWeight: 700 }}>{children}</div>;
+  return <div style={{ fontSize: 10, letterSpacing: "0.16em", color: "#F97316", fontFamily: "monospace", marginBottom: 16, paddingBottom: 9, borderBottom: "1px solid #999999", fontWeight: 700 }}>{children}</div>;
 }
 
 function PackageContractSection({ pkg, num }) {
@@ -207,26 +194,26 @@ function PackageContractSection({ pkg, num }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24 }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 6 }}>
-            <span style={{ fontSize: 10, color: "#9090A0", fontFamily: "monospace" }}>2.{num}</span>
+            <span style={{ fontSize: 10, color: "#666666", fontFamily: "monospace" }}>2.{num}</span>
             <span style={{ fontWeight: 700, fontSize: 15.5 }}>{pkg.name}</span>
             <span style={{ fontSize: 10.5, color: pkg.accent, border: `1px solid ${pkg.accent}`, padding: "2px 8px", borderRadius: 3 }}>{pkg.subtitle}</span>
           </div>
-          <p style={{ fontSize: 12.5, color: "#5A5A72", lineHeight: 1.7, margin: "0 0 16px" }}>{pkg.description}</p>
+          <p style={{ fontSize: 12.5, color: "#333333", lineHeight: 1.7, margin: "0 0 16px" }}>{pkg.description}</p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-            <div><div style={{ fontSize: 9.5, color: "#9090A0", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "monospace" }}>FEATURES INCLUDED</div>{pkg.includes.map((f, i) => <div key={i} style={{ display: "flex", gap: 6, marginBottom: 4.5, fontSize: 11.5, color: "#2A2A3A" }}><span style={{ color: pkg.accent }}>✓</span>{f}</div>)}</div>
-            <div><div style={{ fontSize: 9.5, color: "#9090A0", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "monospace" }}>DELIVERABLES</div>{pkg.deliverables.map((d, i) => <div key={i} style={{ display: "flex", gap: 6, marginBottom: 4.5, fontSize: 11.5, color: "#2A2A3A" }}><span style={{ color: "#27AE60" }}>→</span>{d}</div>)}</div>
+            <div><div style={{ fontSize: 9.5, color: "#666666", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "monospace" }}>FEATURES INCLUDED</div>{pkg.includes.map((f, i) => <div key={i} style={{ display: "flex", gap: 6, marginBottom: 4.5, fontSize: 11.5, color: "#333333" }}><span style={{ color: pkg.accent }}>✓</span>{f}</div>)}</div>
+            <div><div style={{ fontSize: 9.5, color: "#666666", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "monospace" }}>DELIVERABLES</div>{pkg.deliverables.map((d, i) => <div key={i} style={{ display: "flex", gap: 6, marginBottom: 4.5, fontSize: 11.5, color: "#333333" }}><span style={{ color: "#27AE60" }}>→</span>{d}</div>)}</div>
           </div>
           <div style={{ background: "#F9F8F5", borderRadius: 6, padding: "12px 16px", marginTop: 16 }}>
-            <div style={{ fontSize: 9.5, color: "#9090A0", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "monospace" }}>MONTHLY FEE BREAKDOWN ({fmt(pkg.monthly)}/mo)</div>
-            {pkg.monthly_breakdown.map((m, i) => <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#404060", marginBottom: 3.5 }}><span>{m.item}</span><span style={{ fontWeight: 600 }}>{m.cost}</span></div>)}
+            <div style={{ fontSize: 9.5, color: "#666666", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "monospace" }}>MONTHLY FEE BREAKDOWN ({fmt(pkg.monthly)}/mo)</div>
+            {pkg.monthly_breakdown.map((m, i) => <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#333333", marginBottom: 3.5 }}><span>{m.item}</span><span style={{ fontWeight: 600 }}>{m.cost}</span></div>)}
           </div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0, minWidth: 110 }}>
           <div style={{ fontSize: 21, fontWeight: 700, color: "#F97316" }}>{fmt(pkg.oneTime)}</div>
-          <div style={{ fontSize: 11, color: "#9090A0" }}>one-time setup</div>
+          <div style={{ fontSize: 11, color: "#666666" }}>one-time setup</div>
           <div style={{ fontSize: 16, fontWeight: 700, color: "#22D3EE", marginTop: 6 }}>{fmt(pkg.monthly)}/mo</div>
-          <div style={{ fontSize: 11, color: "#9090A0" }}>recurring</div>
-          <div style={{ fontSize: 11, color: "#9090A0", marginTop: 8 }}>{pkg.weeksMin}–{pkg.weeksMax} weeks</div>
+          <div style={{ fontSize: 11, color: "#666666" }}>recurring</div>
+          <div style={{ fontSize: 11, color: "#666666", marginTop: 8 }}>{pkg.weeksMin}–{pkg.weeksMax} weeks</div>
         </div>
       </div>
     </div>
@@ -239,19 +226,19 @@ function AddonContractSection({ addon, num }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24 }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 6 }}>
-            <span style={{ fontSize: 10, color: "#9090A0", fontFamily: "monospace" }}>2.{num}</span>
+            <span style={{ fontSize: 10, color: "#666666", fontFamily: "monospace" }}>2.{num}</span>
             <span style={{ fontWeight: 700, fontSize: 14.5 }}>{addon.name}</span>
-            <span style={{ fontSize: 10, color: "#9090A0", border: "1px solid #D0CCC8", padding: "2px 8px", borderRadius: 3 }}>ADD-ON</span>
+            <span style={{ fontSize: 10, color: "#666666", border: "1px solid #D0CCC8", padding: "2px 8px", borderRadius: 3 }}>ADD-ON</span>
           </div>
-          <p style={{ fontSize: 12.5, color: "#5A5A72", lineHeight: 1.65, margin: "0 0 8px" }}>{addon.desc}</p>
+          <p style={{ fontSize: 12.5, color: "#333333", lineHeight: 1.65, margin: "0 0 8px" }}>{addon.desc}</p>
           <div style={{ fontSize: 12, color: "#27AE60" }}>→ Deliverable: {addon.deliverable}</div>
-          <div style={{ fontSize: 11.5, color: "#9090A0", marginTop: 6 }}>Monthly fee note: {addon.monthlyNote}</div>
+          <div style={{ fontSize: 11.5, color: "#666666", marginTop: 6 }}>Monthly fee note: {addon.monthlyNote}</div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0, minWidth: 110 }}>
           <div style={{ fontSize: 19, fontWeight: 700, color: "#F97316" }}>{fmt(addon.oneTime)}</div>
-          <div style={{ fontSize: 11, color: "#9090A0" }}>one-time</div>
+          <div style={{ fontSize: 11, color: "#666666" }}>one-time</div>
           <div style={{ fontSize: 14, fontWeight: 700, color: "#22D3EE", marginTop: 5 }}>{fmt(addon.monthly)}/mo</div>
-          <div style={{ fontSize: 11, color: "#9090A0", marginTop: 6 }}>{addon.weeksMin} week</div>
+          <div style={{ fontSize: 11, color: "#666666", marginTop: 6 }}>{addon.weeksMin} week</div>
         </div>
       </div>
     </div>
@@ -277,7 +264,7 @@ function ContractTimeline({ bundleSelected, selectedPackages, selectedAddons }) 
       {phases.map((ph, i) => (
         <div key={i} style={{ display: "flex", gap: 0, marginBottom: 12 }}>
           <div style={{ width: 150, flexShrink: 0, fontSize: 11.5, fontWeight: 700, color: ph.isAddon ? "#A78BFA" : "#F97316", paddingTop: 1, paddingRight: 16 }}>{ph.label}</div>
-          <div style={{ flex: 1, fontSize: 12.5, color: "#2A2A3A", lineHeight: 1.65, paddingLeft: 18, borderLeft: "2px solid #EEECE8" }}>
+          <div style={{ flex: 1, fontSize: 12.5, color: "#333333", lineHeight: 1.65, paddingLeft: 18, borderLeft: "2px solid #EEECE8" }}>
             {ph.pkgName && <span style={{ fontWeight: 700, color: ph.accent }}>{ph.pkgName}: </span>}{ph.task}
           </div>
         </div>
@@ -296,11 +283,11 @@ function InvestmentTable({ bundleSelected, selectedPackages, selectedAddons, tot
   selectedAddons.forEach(a => rows.push({ label: a.name, sub: "Add-on service", oneTime: a.oneTime, monthly: a.monthly }));
   return (
     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
-      <thead><tr style={{ borderBottom: "2px solid #2A2A3A" }}><th style={{ textAlign: "left", padding: "8px 0", color: "#9090A0", fontWeight: 700, letterSpacing: "0.1em", fontSize: 9.5, fontFamily: "monospace" }}>SERVICE</th><th style={{ textAlign: "right", padding: "8px 16px", color: "#9090A0", fontWeight: 700, letterSpacing: "0.1em", fontSize: 9.5, fontFamily: "monospace" }}>ONE-TIME</th><th style={{ textAlign: "right", padding: "8px 0", color: "#9090A0", fontWeight: 700, letterSpacing: "0.1em", fontSize: 9.5, fontFamily: "monospace" }}>MONTHLY</th></tr></thead>
+      <thead><tr style={{ borderBottom: "2px solid #2A2A3A" }}><th style={{ textAlign: "left", padding: "8px 0", color: "#333333", fontWeight: 700, letterSpacing: "0.1em", fontSize: 9.5, fontFamily: "monospace" }}>SERVICE</th><th style={{ textAlign: "right", padding: "8px 16px", color: "#333333", fontWeight: 700, letterSpacing: "0.1em", fontSize: 9.5, fontFamily: "monospace" }}>ONE-TIME</th><th style={{ textAlign: "right", padding: "8px 0", color: "#333333", fontWeight: 700, letterSpacing: "0.1em", fontSize: 9.5, fontFamily: "monospace" }}>MONTHLY</th></tr></thead>
       <tbody>
-        {rows.map((r, i) => <tr key={i} style={{ borderBottom: "1px solid #F0EDE8", background: r.highlight ? "#FFF8F3" : "transparent" }}><td style={{ padding: "11px 0" }}><div style={{ fontWeight: 600, color: "#1A1A2E" }}>{r.label}</div>{r.sub && <div style={{ fontSize: 11, color: r.highlight ? "#27AE60" : "#9090A0", marginTop: 2 }}>{r.highlight ? "★ " : ""}{r.sub}</div>}</td><td style={{ textAlign: "right", padding: "11px 16px", fontWeight: 600 }}>{fmt(r.oneTime)}</td><td style={{ textAlign: "right", padding: "11px 0", fontWeight: 600 }}>{fmt(r.monthly)}/mo</td></tr>)}
+        {rows.map((r, i) => <tr key={i} style={{ borderBottom: "1px solid #F0EDE8", background: r.highlight ? "#FFF8F3" : "transparent" }}><td style={{ padding: "11px 0" }}><div style={{ fontWeight: 600, color: "#1A1A2E" }}>{r.label}</div>{r.sub && <div style={{ fontSize: 11, color: r.highlight ? "#27AE60" : "#666666", marginTop: 2 }}>{r.highlight ? "★ " : ""}{r.sub}</div>}</td><td style={{ textAlign: "right", padding: "11px 16px", fontWeight: 600, color: "#333333" }}>{fmt(r.oneTime)}</td><td style={{ textAlign: "right", padding: "11px 0", fontWeight: 600, color: "#333333" }}>{fmt(r.monthly)}/mo</td></tr>)}
       </tbody>
-      <tfoot><tr style={{ borderTop: "2px solid #1A1A2E" }}><td style={{ padding: "14px 0", fontWeight: 800, fontSize: 16 }}>TOTAL INVESTMENT</td><td style={{ textAlign: "right", padding: "14px 16px", fontWeight: 800, fontSize: 20, color: "#F97316" }}>{fmt(totalOneTime)}</td><td style={{ textAlign: "right", padding: "14px 0", fontWeight: 800, fontSize: 17, color: "#22D3EE" }}>{fmt(totalMonthly)}/mo</td></tr></tfoot>
+      <tfoot><tr style={{ borderTop: "2px solid #1A1A2E" }}><td style={{ padding: "14px 0", fontWeight: 800, fontSize: 16, color: "#1A1A2E" }}>TOTAL INVESTMENT</td><td style={{ textAlign: "right", padding: "14px 16px", fontWeight: 800, fontSize: 20, color: "#F97316" }}>{fmt(totalOneTime)}</td><td style={{ textAlign: "right", padding: "14px 0", fontWeight: 800, fontSize: 17, color: "#22D3EE" }}>{fmt(totalMonthly)}/mo</td></tr></tfoot>
     </table>
   );
 }
@@ -310,18 +297,18 @@ function PaymentTermsSection({ totalOneTime, totalMonthly, bundleSelected }) {
   const balance = totalOneTime - deposit;
   const supportDays = bundleSelected ? 60 : 30;
   return (
-    <div style={{ fontSize: 12.5, color: "#2A2A3A", lineHeight: 1.85 }}>
+    <div style={{ fontSize: 12.5, color: "#333333", lineHeight: 1.85 }}>
       <div style={{ marginBottom: 16 }}>
-        <strong>One-Time Setup Fee — {fmt(totalOneTime)} total:</strong>
+        <strong style={{ color: "#1A1A2E" }}>One-Time Setup Fee — {fmt(totalOneTime)} total:</strong>
         <div style={{ paddingLeft: 16, marginTop: 4 }}><div>· 50% deposit ({fmt(deposit)}) due upon execution to initiate the project.</div><div>· 50% balance ({fmt(balance)}) due upon system go-live.</div></div>
       </div>
       <div style={{ marginBottom: 16 }}>
-        <strong>Monthly Recurring — {fmt(totalMonthly)}/month:</strong>
+        <strong style={{ color: "#1A1A2E" }}>Monthly Recurring — {fmt(totalMonthly)}/month:</strong>
         <div style={{ paddingLeft: 16, marginTop: 4 }}><div>· First month billed on go-live date. Subsequent billing on same day each month.</div><div>· All-inclusive: hosting, cloud storage, API access, SMS/email, AI tokens, and maintenance.</div><div>· 30 days written notice required to cancel.</div></div>
       </div>
-      <div style={{ marginBottom: 16 }}><strong>Accepted Payment Methods:</strong> ACH bank transfer, business check, or credit/debit card (3% processing fee applies to card payments).</div>
-      <div style={{ marginBottom: 16 }}><strong>Post-Launch Support:</strong> HD Connex provides a {supportDays}-day post-launch support window at no charge.</div>
-      <div><strong>Intellectual Property:</strong> All automation logic built under this Agreement are the property of HD Connex and licensed to Client for the duration of the active monthly service.</div>
+      <div style={{ marginBottom: 16 }}><strong style={{ color: "#1A1A2E" }}>Accepted Payment Methods:</strong> ACH bank transfer, business check, or credit/debit card (3% processing fee applies to card payments).</div>
+      <div style={{ marginBottom: 16 }}><strong style={{ color: "#1A1A2E" }}>Post-Launch Support:</strong> HD Connex provides a {supportDays}-day post-launch support window at no charge.</div>
+      <div><strong style={{ color: "#1A1A2E" }}>Intellectual Property:</strong> All automation logic built under this Agreement are the property of HD Connex and licensed to Client for the duration of the active monthly service.</div>
     </div>
   );
 }
@@ -392,9 +379,9 @@ Agreement ${contractNum} | ${TODAY}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 36, paddingBottom: 22, borderBottom: "3px solid #F97316" }}>
           <HDLogo dark={false} />
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 10, color: "#9090A0", letterSpacing: "0.14em", fontFamily: "monospace" }}>SERVICE AGREEMENT</div>
+            <div style={{ fontSize: 10, color: "#666666", letterSpacing: "0.14em", fontFamily: "monospace" }}>SERVICE AGREEMENT</div>
             <div style={{ fontSize: 18, fontWeight: 800, color: "#1A1A2E", marginTop: 4 }}>#{contractNum}</div>
-            <div style={{ fontSize: 11.5, color: "#9090A0", marginTop: 4 }}>Issued: {TODAY}</div>
+            <div style={{ fontSize: 11.5, color: "#666666", marginTop: 4 }}>Issued: {TODAY}</div>
           </div>
         </div>
 
@@ -402,17 +389,17 @@ Agreement ${contractNum} | ${TODAY}
           <div style={{ background: "#F9F8F5", padding: "18px 20px", borderRadius: 6 }}>
             <div style={{ fontSize: 9.5, color: "#F97316", letterSpacing: "0.14em", marginBottom: 8, fontFamily: "monospace", fontWeight: 700 }}>SERVICE PROVIDER</div>
             <div style={{ fontWeight: 700, fontSize: 15 }}>HD Connex</div>
-            <div style={{ fontSize: 12, color: "#6060A0", marginTop: 5, lineHeight: 1.7 }}>Cognitive Architecture & Intelligence<br />Daytona Beach, Florida<br />contact@hdconnex.com</div>
+            <div style={{ fontSize: 12, color: "#666666", marginTop: 5, lineHeight: 1.7 }}>Cognitive Architecture & Intelligence<br />Daytona Beach, Florida<br />contact@hdconnex.com</div>
           </div>
           <div style={{ background: "#F9F8F5", padding: "18px 20px", borderRadius: 6 }}>
             <div style={{ fontSize: 9.5, color: "#22D3EE", letterSpacing: "0.14em", marginBottom: 8, fontFamily: "monospace", fontWeight: 700 }}>CLIENT</div>
             <div style={{ fontWeight: 700, fontSize: 15 }}>Mason Avenue Gun & Pawn</div>
-            <div style={{ fontSize: 12, color: "#6060A0", marginTop: 5, lineHeight: 1.7 }}>Daytona Beach, Florida<br />Federal Firearms Licensee (FFL)<br />Licensed Pawnbroker — Volusia County, FL</div>
+            <div style={{ fontSize: 12, color: "#666666", marginTop: 5, lineHeight: 1.7 }}>Daytona Beach, Florida<br />Federal Firearms Licensee (FFL)<br />Licensed Pawnbroker — Volusia County, FL</div>
           </div>
         </div>
 
         <div style={{ padding: "18px 22px", borderLeft: "4px solid #F97316", background: "#FFF9F4", marginBottom: 36, borderRadius: "0 6px 6px 0" }}>
-          <p style={{ fontSize: 13, color: "#2A1A0A", lineHeight: 1.75, margin: 0 }}>This Service Agreement is entered into as of <strong>{TODAY}</strong> between HD Connex and Mason Avenue Gun & Pawn.</p>
+          <p style={{ fontSize: 13, color: "#333333", lineHeight: 1.75, margin: 0 }}>This Service Agreement is entered into as of <strong>{TODAY}</strong> between HD Connex and Mason Avenue Gun & Pawn.</p>
         </div>
 
         <div style={{ marginBottom: 36 }}>
@@ -420,13 +407,13 @@ Agreement ${contractNum} | ${TODAY}
           <div style={{ display: "flex", justifyContent: "space-between", gap: 24 }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}>Mason Avenue Gun & Pawn — Business Website</div>
-              <p style={{ fontSize: 12.5, color: "#5A5A72", lineHeight: 1.7, margin: "0 0 10px" }}>Professional business website — fully designed, developed, and delivered. Status: <strong style={{ color: "#27AE60" }}>COMPLETE & LIVE</strong>.</p>
+              <p style={{ fontSize: 12.5, color: "#333333", lineHeight: 1.7, margin: "0 0 10px" }}>Professional business website — fully designed, developed, and delivered. Status: <strong style={{ color: "#27AE60" }}>COMPLETE & LIVE</strong>.</p>
             </div>
             <div style={{ textAlign: "right", flexShrink: 0, minWidth: 110 }}>
               <div style={{ fontSize: 19, fontWeight: 700, color: "#F97316" }}>{fmt(WEBSITE.oneTime)}</div>
-              <div style={{ fontSize: 11, color: "#9090A0" }}>one-time</div>
+              <div style={{ fontSize: 11, color: "#666666" }}>one-time</div>
               <div style={{ fontSize: 15, fontWeight: 700, color: "#22D3EE", marginTop: 6 }}>{fmt(WEBSITE.monthly)}/mo</div>
-              <div style={{ fontSize: 11, color: "#9090A0" }}>maintenance</div>
+              <div style={{ fontSize: 11, color: "#666666" }}>maintenance</div>
             </div>
           </div>
         </div>
@@ -440,7 +427,7 @@ Agreement ${contractNum} | ${TODAY}
 
         <div style={{ marginBottom: 36 }}>
           <SectionHeader>SECTION 3 — IMPLEMENTATION TIMELINE</SectionHeader>
-          <div style={{ fontSize: 12.5, color: "#5A5A72", marginBottom: 16 }}>Estimated total implementation time: <strong>{timeline}</strong>.</div>
+          <div style={{ fontSize: 12.5, color: "#333333", marginBottom: 16 }}>Estimated total implementation time: <strong style={{ color: "#1A1A2E" }}>{timeline}</strong>.</div>
           <ContractTimeline bundleSelected={bundleSelected} selectedPackages={selectedPackages} selectedAddons={selectedAddons} />
         </div>
 
@@ -448,7 +435,7 @@ Agreement ${contractNum} | ${TODAY}
           <SectionHeader>SECTION 4 — INVESTMENT SUMMARY</SectionHeader>
           <InvestmentTable bundleSelected={bundleSelected} selectedPackages={selectedPackages} selectedAddons={selectedAddons} totalOneTime={totalOneTime} totalMonthly={totalMonthly} />
           <div style={{ background: "#F0FFF8", border: "1px solid #B8E8C8", borderRadius: 6, padding: "12px 18px", marginTop: 18 }}>
-            <div style={{ fontSize: 11, color: "#1A4A2A", fontWeight: 600 }}>✓ Monthly fees are all-inclusive. No surprise bills.</div>
+            <div style={{ fontSize: 11, color: "#333333", fontWeight: 600 }}>✓ Monthly fees are all-inclusive. No surprise bills.</div>
           </div>
         </div>
 
@@ -503,7 +490,7 @@ function App() {
     return { totalOneTime: ot, totalMonthly: mo };
   }, [bundleSelected, pkgs, addons]);
 
-  const hasSelections = bundleSelected || pkgs.size > 0;
+  const hasSelections = true;
 
   if (view === "contract") {
     return <Contract bundleSelected={bundleSelected} pkgs={pkgs} addons={addons} totalOneTime={totalOneTime} totalMonthly={totalMonthly} onBack={() => setView("form")} />;
