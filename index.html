@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HD Connex — Automation Proposal</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Georgia', serif; background: #0A0A0F; color: #F0F0F8; }
+@media print {
+  [data-print-hide] { display: none !important; }
+  body { background: white !important; color: #1A1A2E !important; }
+  * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo } = React;
+
+const TODAY = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+const fmt = n => "$" + Number(n).toLocaleString();
+
+const WEBSITE = { oneTime: 1100, monthly: 100 };
+
+const PACKAGES = [
+  {
+    id: "compliance",
+    name: "Compliance Core",
+    subtitle: "ATF / FFL Legal Protection",
+    oneTime: 2500, monthly: 110, weeksMin: 3, weeksMax: 4, accent: "#F97316",
+    description: "Full ATF and federal firearms compliance automation. Eliminates manual bound-book errors, automates NICS background check submission, enforces state law at every transaction, and generates ATF Form 3310.4 automatically when triggered.",
+    includes: ["Electronic Bound Book — ATF acquisition & disposition sync","Digital Form 4473 with e-signature capture","NICS e-Check direct API integration","State & local law rules engine (FL configured at launch)","Straw purchase red flag detection","Multiple sale auto-report — ATF Form 3310.4","Mandatory serial number photo at intake","NCIC stolen-firearm check integration","Instant trace request lookup by serial number","Automatic disposition recording post-transfer"],
+    deliverables: ["Fully configured electronic bound book (ATF-compliant, 20+ yr retention)","NICS integration authenticated with your FFL credentials","Florida state law rules engine configured and field-tested","Serial photo workflow live on all store devices","Straw purchase alert rules configured","ATF Form 3310.4 auto-generation enabled and verified","Staff training: complete 4473 digital workflow (min. 2 staff members)","30-day post-launch support window"],
+    phases: [{ label: "Week 1", task: "FFL credential review, system architecture, FL rules engine configuration" },{ label: "Week 2", task: "NICS API integration, serial photo workflow, 4473 e-signature testing" },{ label: "Week 3", task: "Form 3310.4 auto-queue, straw flag validation, stolen-gun check" },{ label: "Week 4", task: "Dual-run period, staff training, ATF readiness audit, go-live" }],
+    monthly_breakdown: [{ item: "Platform hosting & cloud infrastructure", cost: "$35" },{ item: "Long-term record storage (ATF 20-yr archive)", cost: "$20" },{ item: "NICS API transaction processing", cost: "$20" },{ item: "System maintenance & compliance updates", cost: "$35" }]
+  },
+  {
+    id: "pawn",
+    name: "Pawn Operations Suite",
+    subtitle: "End-to-End Loan Management",
+    oneTime: 2200, monthly: 175, weeksMin: 2, weeksMax: 3, accent: "#22D3EE",
+    description: "Eliminates paper tickets entirely. Digital pawn contracts, automated customer reminders, live loan dashboard, and automatic transfer to retail inventory when a loan legally forfeits. Built for Florida pawnbroker statutes.",
+    includes: ["Digital pawn contracts with e-signature capture","Live loan tracking dashboard — color-coded by status","Automated SMS & email reminders (5-day, 1-day, due-date alerts)","Customer 360° history — all loans, outcomes, every item ever pawned","Auto police hold report generation","Partial redemption processing","Auto-transfer to retail inventory on legal forfeiture","Customer photo ID scan at intake","APR / interest auto-calculation (FL statute-compliant)","Fingerprint ID verification (USB reader compatible)"],
+    deliverables: ["Deployed live loan tracking dashboard","FL-compliant digital pawn contract with all required disclosures","SMS notification pipeline (Twilio) configured and live","Customer database migrated from existing paper/digital records","Police hold reporting configured for Daytona Beach PD format","Forfeiture-to-retail automation tested end-to-end","Staff training: complete pawn loan workflow (min. 2 staff)","30-day post-launch support window"],
+    phases: [{ label: "Week 1", task: "Existing record migration, FL-compliant contract template build, ID scan setup" },{ label: "Week 2", task: "SMS/email automation (Twilio), loan dashboard config, police report integration" },{ label: "Week 3", task: "End-to-end testing, forfeiture flow, staff training, go-live" }],
+    monthly_breakdown: [{ item: "Platform hosting & dashboard infrastructure", cost: "$55" },{ item: "Twilio SMS/email notifications (usage-based, avg.)", cost: "$40" },{ item: "Customer record storage & encrypted backups", cost: "$25" },{ item: "System maintenance & FL compliance updates", cost: "$55" }]
+  },
+  {
+    id: "marketplace",
+    name: "Marketplace & Inventory",
+    subtitle: "Multi-Channel Sales Automation",
+    oneTime: 2200, monthly: 175, weeksMin: 2, weeksMax: 3, accent: "#A78BFA",
+    description: "Scan a barcode, snap a photo — every major firearms marketplace has a live listing within seconds. Auto-delists across all channels the instant a sale finalizes in-store.",
+    includes: ["Photo intake workflow + AI auto-description (title, category, condition)","GunBroker.com API — auto-list & instant delist on sale or redemption","Guns.com / GunsAmerica / UsedGuns.com channel sync","Buya.com non-firearm inventory feed (electronics, tools, jewelry, etc.)","Real-time inventory deduction at POS","Online listing auto-removal on redemption or in-store sale","Compliance-gated publishing (locked until bound book entry complete)","State-restricted channel routing (auto-blocks non-compliant states)","Dynamic stock sync for multi-unit items","Barcode/SKU label printing at intake"],
+    deliverables: ["GunBroker dealer account API integration live","Guns.com, GunsAmerica, UsedGuns.com feeds configured and tested","Buya.com non-firearm inventory feed active","AI description engine configured and tuned for pawn categories","Photo-to-listing workflow tested end-to-end","Auto-delist verified across all 5 channels","Barcode printer setup and label print workflow live","Staff training: intake-to-live listing (min. 2 staff)","30-day post-launch support window"],
+    phases: [{ label: "Week 1", task: "Marketplace API credentials, photo intake workflow, barcode printer setup" },{ label: "Week 2", task: "All 5 channel feeds live, compliance gates tested, AI descriptions tuned" },{ label: "Week 3", task: "Auto-delist cross-channel verification, staff training, go-live" }],
+    monthly_breakdown: [{ item: "Platform hosting & sync infrastructure", cost: "$55" },{ item: "AI/LLM tokens (auto-descriptions, avg. monthly)", cost: "$30" },{ item: "Photo storage & CDN delivery", cost: "$35" },{ item: "Marketplace API maintenance & channel updates", cost: "$55" }]
+  }
+];
+
+const BUNDLE = {
+  id: "bundle", name: "Full Platform Bundle", subtitle: "All Three Suites — Maximum Automation",
+  oneTime: 5800, monthly: 395, weeksMin: 6, weeksMax: 8,
+  savingsOneTime: 1100, savingsMonthly: 65,
+  description: "The complete system. ATF compliance, pawn loan management, and multi-channel marketplace automation — all integrated into one platform. Priority onboarding with a dedicated implementation lead.",
+  bonuses: ["Priority onboarding (dedicated implementation manager)","Cross-suite integrations at no charge (forfeiture → marketplace pipeline)","Unified customer database across all three modules","Extended 60-day post-launch support window"]
+};
+
+const ADDONS = [
+  { id: "quickbooks", name: "QuickBooks Integration", desc: "Automated end-of-day reconciliation. Every transaction flows directly into QuickBooks — clean books, tax-ready records, zero manual entry.", oneTime: 600, monthly: 35, weeksMin: 1, weeksMax: 1, deliverable: "QuickBooks Online integration configured, tested, and staff-trained.", monthlyNote: "Covers QB API access, data sync, and maintenance." },
+  { id: "valuation", name: "Inventory Valuation Reporting", desc: "Real-time on-hand value dashboard: pawn loan equity vs. retail value, aging analysis, projected forfeiture revenue, and high-velocity item reporting.", oneTime: 450, monthly: 25, weeksMin: 1, weeksMax: 1, deliverable: "Custom valuation dashboard deployed, refreshing on a daily automated schedule.", monthlyNote: "Covers hosting, data compute, and report generation." },
+  { id: "loyalty", name: "Loyalty Program Module", desc: "Points and rewards tracked on every transaction. Configurable reward tiers and redemption rules.", oneTime: 500, monthly: 30, weeksMin: 1, weeksMax: 2, deliverable: "Loyalty engine live, reward tiers configured to store specs, customer-facing lookup active.", monthlyNote: "Covers customer data storage, point engine hosting, and updates." },
+  { id: "multilocation", name: "Multi-Location Sync", desc: "Real-time inventory visibility across all storefronts. Unified FFL compliance. Transfer items between locations with a single scan.", oneTime: 1100, monthly: 60, weeksMin: 2, weeksMax: 2, deliverable: "Multi-location dashboard live with real-time cross-store inventory and transfer workflow.", monthlyNote: "Covers multi-location infrastructure, sync, and cross-site API." }
+];
+
+function getTimeline(bundleSelected, selectedPackages, selectedAddons) {
+  if (bundleSelected) return `6–8 weeks${selectedAddons.length > 0 ? " (add-ons run in parallel during final phase)" : ""}`;
+  if (selectedPackages.length === 0) return "Select at least one package";
+  const maxMin = Math.max(...selectedPackages.map(p => p.weeksMin));
+  const maxMax = Math.max(...selectedPackages.map(p => p.weeksMax));
+  const extra = selectedAddons.length > 0 ? 1 : 0;
+  return `${maxMin}–${maxMax + extra} weeks`;
+}
+
+function HDLogo({ dark = false }) {
+  return (
+    <div style={{ userSelect: "none" }}>
+      <img src="https://plain-enam-prod-public.komododecks.com/202605/10/eKfzaqKNPzMmXUv3tQCH/image.png" alt="HD Connex" style={{ height: 52 }} />
+    </div>
+  );
+}
+
+function SectionLabel({ children }) {
+  return <div style={{ fontSize: 10.5, color: "#8080A0", letterSpacing: "0.14em", marginBottom: 14, fontFamily: "monospace", fontWeight: 600 }}>{children}</div>;
+}
+
+function BundleCard({ selected, onToggle }) {
+  return (
+    <div onClick={onToggle} style={{ background: selected ? "linear-gradient(135deg, rgba(249,115,22,0.12) 0%, rgba(34,211,238,0.08) 100%)" : "#16161E", border: `2px solid ${selected ? "#F97316" : "#2A2A3A"}`, borderRadius: 10, padding: "26px 28px", cursor: "pointer", position: "relative" }}>
+      <div style={{ position: "absolute", top: -1, right: 20, background: "#F97316", color: "#0A0A0F", fontSize: 10, fontWeight: 800, padding: "4px 12px", letterSpacing: "0.1em", fontFamily: "monospace", borderRadius: "0 0 6px 6px" }}>BEST VALUE · SAVE $2,000</div>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 18 }}>
+        <div style={{ width: 26, height: 26, borderRadius: 6, flexShrink: 0, marginTop: 3, border: `2px solid ${selected ? "#F97316" : "#3A3A4A"}`, background: selected ? "#F97316" : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {selected && <span style={{ color: "#0A0A0F", fontWeight: 900, fontSize: 15 }}>✓</span>}
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap", marginBottom: 6 }}>
+            <span style={{ fontSize: 20, fontWeight: 700 }}>{BUNDLE.name}</span>
+            <span style={{ fontSize: 12, color: "#8080A0" }}>{BUNDLE.subtitle}</span>
+          </div>
+          <div style={{ fontSize: 13, color: "#A0A0B8", marginBottom: 18, lineHeight: 1.6 }}>{BUNDLE.description}</div>
+          <div style={{ display: "flex", gap: 32, flexWrap: "wrap", marginBottom: 16 }}>
+            <div><div style={{ fontSize: 10, color: "#6060A0", letterSpacing: "0.1em", marginBottom: 4 }}>ONE-TIME SETUP</div><div style={{ fontSize: 24, fontWeight: 700, color: "#F97316" }}>{fmt(BUNDLE.oneTime)}</div><div style={{ fontSize: 11, color: "#4CAF50" }}>Save {fmt(BUNDLE.savingsOneTime)} vs. à la carte</div></div>
+            <div><div style={{ fontSize: 10, color: "#6060A0", letterSpacing: "0.1em", marginBottom: 4 }}>MONTHLY</div><div style={{ fontSize: 24, fontWeight: 700, color: "#22D3EE" }}>{fmt(BUNDLE.monthly)}/mo</div><div style={{ fontSize: 11, color: "#4CAF50" }}>Save ${BUNDLE.savingsMonthly}/mo vs. à la carte</div></div>
+            <div><div style={{ fontSize: 10, color: "#6060A0", letterSpacing: "0.1em", marginBottom: 4 }}>TIMELINE</div><div style={{ fontSize: 24, fontWeight: 700 }}>{BUNDLE.weeksMin}–{BUNDLE.weeksMax} wks</div></div>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {BUNDLE.bonuses.map((b, i) => <div key={i} style={{ background: "rgba(249,115,22,0.1)", border: "1px solid rgba(249,115,22,0.25)", borderRadius: 4, padding: "3px 10px", fontSize: 11.5, color: "#F97316" }}>+ {b}</div>)}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PackageCard({ pkg, selected, disabled, onToggle }) {
+  const [expanded, setExpanded] = useState(false);
+  const rgbMap = { "#F97316": "249,115,22", "#22D3EE": "34,211,238", "#A78BFA": "167,139,250" };
+  const rgb = rgbMap[pkg.accent] || "249,115,22";
+  return (
+    <div style={{ background: selected ? `rgba(${rgb},0.07)` : "#16161E", border: `2px solid ${selected ? pkg.accent : disabled ? "#1A1A26" : "#2A2A3A"}`, borderRadius: 10, opacity: disabled ? 0.38 : 1, display: "flex", flexDirection: "column" }}>
+      <div onClick={!disabled ? onToggle : undefined} style={{ padding: "22px 22px 16px", cursor: disabled ? "not-allowed" : "pointer", flex: 1 }}>
+        <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+          <div style={{ width: 20, height: 20, borderRadius: 4, flexShrink: 0, marginTop: 3, border: `2px solid ${selected ? pkg.accent : "#3A3A4A"}`, background: selected ? pkg.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {selected && <span style={{ color: "#0A0A0F", fontWeight: 900, fontSize: 12 }}>✓</span>}
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 2 }}>{pkg.name}</div>
+            <div style={{ fontSize: 11, color: pkg.accent, letterSpacing: "0.06em", marginBottom: 10 }}>{pkg.subtitle}</div>
+            <div style={{ fontSize: 12.5, color: "#9090A8", lineHeight: 1.6, marginBottom: 14 }}>{pkg.description}</div>
+            <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
+              <div><div style={{ fontSize: 9.5, color: "#6060A0", letterSpacing: "0.1em" }}>SETUP</div><div style={{ fontSize: 20, fontWeight: 700, color: pkg.accent }}>{fmt(pkg.oneTime)}</div></div>
+              <div><div style={{ fontSize: 9.5, color: "#6060A0", letterSpacing: "0.1em" }}>MONTHLY</div><div style={{ fontSize: 20, fontWeight: 700, color: "#22D3EE" }}>{fmt(pkg.monthly)}/mo</div></div>
+              <div><div style={{ fontSize: 9.5, color: "#6060A0", letterSpacing: "0.1em" }}>TIMELINE</div><div style={{ fontSize: 20, fontWeight: 700 }}>{pkg.weeksMin}–{pkg.weeksMax}w</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div onClick={e => { e.stopPropagation(); setExpanded(!expanded); }} style={{ padding: "9px 22px", borderTop: "1px solid #2A2A3A", cursor: "pointer", fontSize: 11.5, color: "#6060A0", display: "flex", alignItems: "center", gap: 6, userSelect: "none" }}>
+        <span>{expanded ? "▲" : "▼"}</span><span>{expanded ? "Hide" : "View"} all features & deliverables</span>
+      </div>
+      {expanded && (
+        <div style={{ padding: "4px 22px 20px", borderTop: "1px solid #1E1E28" }}>
+          <div style={{ fontSize: 10.5, color: "#8080A0", letterSpacing: "0.1em", margin: "14px 0 8px", fontFamily: "monospace" }}>INCLUDES</div>
+          {pkg.includes.map((f, i) => <div key={i} style={{ display: "flex", gap: 8, marginBottom: 5, fontSize: 12.5, color: "#C0C0D0" }}><span style={{ color: pkg.accent, flexShrink: 0 }}>›</span>{f}</div>)}
+          <div style={{ fontSize: 10.5, color: "#8080A0", letterSpacing: "0.1em", margin: "14px 0 8px", fontFamily: "monospace" }}>DELIVERABLES</div>
+          {pkg.deliverables.map((d, i) => <div key={i} style={{ display: "flex", gap: 8, marginBottom: 5, fontSize: 12.5, color: "#C0C0D0" }}><span style={{ color: "#4CAF50", flexShrink: 0 }}>→</span>{d}</div>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AddonCard({ addon, selected, onToggle }) {
+  return (
+    <div onClick={onToggle} style={{ background: selected ? "rgba(249,115,22,0.07)" : "#16161E", border: `1px solid ${selected ? "#F97316" : "#2A2A3A"}`, borderRadius: 8, padding: "16px 18px", cursor: "pointer", display: "flex", gap: 14, alignItems: "flex-start" }}>
+      <div style={{ width: 17, height: 17, borderRadius: 3, flexShrink: 0, marginTop: 2, border: `2px solid ${selected ? "#F97316" : "#3A3A4A"}`, background: selected ? "#F97316" : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {selected && <span style={{ color: "#0A0A0F", fontWeight: 900, fontSize: 11 }}>✓</span>}
+      </div>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{addon.name}</div>
+        <div style={{ fontSize: 12, color: "#8080A0", lineHeight: 1.55, marginBottom: 10 }}>{addon.desc}</div>
+        <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 13.5, color: "#F97316", fontWeight: 700 }}>{fmt(addon.oneTime)}</span>
+          <span style={{ fontSize: 13.5, color: "#22D3EE", fontWeight: 600 }}>{fmt(addon.monthly)}/mo</span>
+          <span style={{ fontSize: 12, color: "#6060A0" }}>{addon.weeksMin} wk</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SectionHeader({ children }) {
+  return <div style={{ fontSize: 10, letterSpacing: "0.16em", color: "#F97316", fontFamily: "monospace", marginBottom: 16, paddingBottom: 9, borderBottom: "1px solid #E8E4DF", fontWeight: 700 }}>{children}</div>;
+}
+
+function PackageContractSection({ pkg, num }) {
+  return (
+    <div style={{ marginBottom: 30, paddingBottom: 30, borderBottom: "1px solid #EEECE8" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24 }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 6 }}>
+            <span style={{ fontSize: 10, color: "#9090A0", fontFamily: "monospace" }}>2.{num}</span>
+            <span style={{ fontWeight: 700, fontSize: 15.5 }}>{pkg.name}</span>
+            <span style={{ fontSize: 10.5, color: pkg.accent, border: `1px solid ${pkg.accent}`, padding: "2px 8px", borderRadius: 3 }}>{pkg.subtitle}</span>
+          </div>
+          <p style={{ fontSize: 12.5, color: "#5A5A72", lineHeight: 1.7, margin: "0 0 16px" }}>{pkg.description}</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+            <div><div style={{ fontSize: 9.5, color: "#9090A0", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "monospace" }}>FEATURES INCLUDED</div>{pkg.includes.map((f, i) => <div key={i} style={{ display: "flex", gap: 6, marginBottom: 4.5, fontSize: 11.5, color: "#2A2A3A" }}><span style={{ color: pkg.accent }}>✓</span>{f}</div>)}</div>
+            <div><div style={{ fontSize: 9.5, color: "#9090A0", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "monospace" }}>DELIVERABLES</div>{pkg.deliverables.map((d, i) => <div key={i} style={{ display: "flex", gap: 6, marginBottom: 4.5, fontSize: 11.5, color: "#2A2A3A" }}><span style={{ color: "#27AE60" }}>→</span>{d}</div>)}</div>
+          </div>
+          <div style={{ background: "#F9F8F5", borderRadius: 6, padding: "12px 16px", marginTop: 16 }}>
+            <div style={{ fontSize: 9.5, color: "#9090A0", letterSpacing: "0.1em", marginBottom: 8, fontFamily: "monospace" }}>MONTHLY FEE BREAKDOWN ({fmt(pkg.monthly)}/mo)</div>
+            {pkg.monthly_breakdown.map((m, i) => <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#404060", marginBottom: 3.5 }}><span>{m.item}</span><span style={{ fontWeight: 600 }}>{m.cost}</span></div>)}
+          </div>
+        </div>
+        <div style={{ textAlign: "right", flexShrink: 0, minWidth: 110 }}>
+          <div style={{ fontSize: 21, fontWeight: 700, color: "#F97316" }}>{fmt(pkg.oneTime)}</div>
+          <div style={{ fontSize: 11, color: "#9090A0" }}>one-time setup</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "#22D3EE", marginTop: 6 }}>{fmt(pkg.monthly)}/mo</div>
+          <div style={{ fontSize: 11, color: "#9090A0" }}>recurring</div>
+          <div style={{ fontSize: 11, color: "#9090A0", marginTop: 8 }}>{pkg.weeksMin}–{pkg.weeksMax} weeks</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AddonContractSection({ addon, num }) {
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: "1px solid #EEECE8" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 24 }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 6 }}>
+            <span style={{ fontSize: 10, color: "#9090A0", fontFamily: "monospace" }}>2.{num}</span>
+            <span style={{ fontWeight: 700, fontSize: 14.5 }}>{addon.name}</span>
+            <span style={{ fontSize: 10, color: "#9090A0", border: "1px solid #D0CCC8", padding: "2px 8px", borderRadius: 3 }}>ADD-ON</span>
+          </div>
+          <p style={{ fontSize: 12.5, color: "#5A5A72", lineHeight: 1.65, margin: "0 0 8px" }}>{addon.desc}</p>
+          <div style={{ fontSize: 12, color: "#27AE60" }}>→ Deliverable: {addon.deliverable}</div>
+          <div style={{ fontSize: 11.5, color: "#9090A0", marginTop: 6 }}>Monthly fee note: {addon.monthlyNote}</div>
+        </div>
+        <div style={{ textAlign: "right", flexShrink: 0, minWidth: 110 }}>
+          <div style={{ fontSize: 19, fontWeight: 700, color: "#F97316" }}>{fmt(addon.oneTime)}</div>
+          <div style={{ fontSize: 11, color: "#9090A0" }}>one-time</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "#22D3EE", marginTop: 5 }}>{fmt(addon.monthly)}/mo</div>
+          <div style={{ fontSize: 11, color: "#9090A0", marginTop: 6 }}>{addon.weeksMin} week</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ContractTimeline({ bundleSelected, selectedPackages, selectedAddons }) {
+  const phases = [];
+  if (bundleSelected) {
+    phases.push({ label: "Weeks 1–2", task: "FFL credential review, full system architecture, all three module configurations begin simultaneously" });
+    phases.push({ label: "Weeks 3–4", task: "Compliance Core live: NICS integration, 4473 e-sig, bound book, FL rules engine, straw flag alerts" });
+    phases.push({ label: "Weeks 4–5", task: "Pawn Operations live: contract templates, SMS automation, loan dashboard, police hold reporting" });
+    phases.push({ label: "Weeks 5–6", task: "Marketplace live: GunBroker + all channel feeds, AI descriptions, compliance-gated publishing, auto-delist tested" });
+    phases.push({ label: "Weeks 7–8", task: "Cross-suite integrations, dual-run period (digital + manual), staff training all modules, ATF readiness audit, full go-live" });
+    if (selectedAddons.length > 0) phases.push({ label: "Parallel (Wks 5–8)", task: `Add-on deployment: ${selectedAddons.map(a => a.name).join(", ")}`, isAddon: true });
+  } else {
+    selectedPackages.forEach(pkg => pkg.phases.forEach(ph => phases.push({ label: ph.label, task: ph.task, pkgName: pkg.name, accent: pkg.accent })));
+    if (selectedAddons.length > 0) phases.push({ label: "Parallel (final week)", task: `Add-on deployment: ${selectedAddons.map(a => a.name).join(", ")}`, isAddon: true });
+    phases.push({ label: "Final 2 weeks", task: "Dual-run period (manual + digital), staff validation, full go-live clearance" });
+  }
+  return (
+    <div>
+      {phases.map((ph, i) => (
+        <div key={i} style={{ display: "flex", gap: 0, marginBottom: 12 }}>
+          <div style={{ width: 150, flexShrink: 0, fontSize: 11.5, fontWeight: 700, color: ph.isAddon ? "#A78BFA" : "#F97316", paddingTop: 1, paddingRight: 16 }}>{ph.label}</div>
+          <div style={{ flex: 1, fontSize: 12.5, color: "#2A2A3A", lineHeight: 1.65, paddingLeft: 18, borderLeft: "2px solid #EEECE8" }}>
+            {ph.pkgName && <span style={{ fontWeight: 700, color: ph.accent }}>{ph.pkgName}: </span>}{ph.task}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function InvestmentTable({ bundleSelected, selectedPackages, selectedAddons, totalOneTime, totalMonthly }) {
+  const rows = [{ label: "Mason Avenue Gun & Pawn — Business Website (completed)", sub: "Includes hosting, SSL, content updates, security monitoring", oneTime: WEBSITE.oneTime, monthly: WEBSITE.monthly }];
+  if (bundleSelected) {
+    rows.push({ label: BUNDLE.name, sub: `All three automation suites — saves ${fmt(BUNDLE.savingsOneTime)} setup + $${BUNDLE.savingsMonthly}/mo vs. individual`, oneTime: BUNDLE.oneTime, monthly: BUNDLE.monthly, highlight: true });
+  } else {
+    selectedPackages.forEach(p => rows.push({ label: p.name, sub: p.subtitle, oneTime: p.oneTime, monthly: p.monthly }));
+  }
+  selectedAddons.forEach(a => rows.push({ label: a.name, sub: "Add-on service", oneTime: a.oneTime, monthly: a.monthly }));
+  return (
+    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12.5 }}>
+      <thead><tr style={{ borderBottom: "2px solid #2A2A3A" }}><th style={{ textAlign: "left", padding: "8px 0", color: "#9090A0", fontWeight: 700, letterSpacing: "0.1em", fontSize: 9.5, fontFamily: "monospace" }}>SERVICE</th><th style={{ textAlign: "right", padding: "8px 16px", color: "#9090A0", fontWeight: 700, letterSpacing: "0.1em", fontSize: 9.5, fontFamily: "monospace" }}>ONE-TIME</th><th style={{ textAlign: "right", padding: "8px 0", color: "#9090A0", fontWeight: 700, letterSpacing: "0.1em", fontSize: 9.5, fontFamily: "monospace" }}>MONTHLY</th></tr></thead>
+      <tbody>
+        {rows.map((r, i) => <tr key={i} style={{ borderBottom: "1px solid #F0EDE8", background: r.highlight ? "#FFF8F3" : "transparent" }}><td style={{ padding: "11px 0" }}><div style={{ fontWeight: 600, color: "#1A1A2E" }}>{r.label}</div>{r.sub && <div style={{ fontSize: 11, color: r.highlight ? "#27AE60" : "#9090A0", marginTop: 2 }}>{r.highlight ? "★ " : ""}{r.sub}</div>}</td><td style={{ textAlign: "right", padding: "11px 16px", fontWeight: 600 }}>{fmt(r.oneTime)}</td><td style={{ textAlign: "right", padding: "11px 0", fontWeight: 600 }}>{fmt(r.monthly)}/mo</td></tr>)}
+      </tbody>
+      <tfoot><tr style={{ borderTop: "2px solid #1A1A2E" }}><td style={{ padding: "14px 0", fontWeight: 800, fontSize: 16 }}>TOTAL INVESTMENT</td><td style={{ textAlign: "right", padding: "14px 16px", fontWeight: 800, fontSize: 20, color: "#F97316" }}>{fmt(totalOneTime)}</td><td style={{ textAlign: "right", padding: "14px 0", fontWeight: 800, fontSize: 17, color: "#22D3EE" }}>{fmt(totalMonthly)}/mo</td></tr></tfoot>
+    </table>
+  );
+}
+
+function PaymentTermsSection({ totalOneTime, totalMonthly, bundleSelected }) {
+  const deposit = Math.round(totalOneTime * 0.5);
+  const balance = totalOneTime - deposit;
+  const supportDays = bundleSelected ? 60 : 30;
+  return (
+    <div style={{ fontSize: 12.5, color: "#2A2A3A", lineHeight: 1.85 }}>
+      <div style={{ marginBottom: 16 }}>
+        <strong>One-Time Setup Fee — {fmt(totalOneTime)} total:</strong>
+        <div style={{ paddingLeft: 16, marginTop: 4 }}><div>· 50% deposit ({fmt(deposit)}) due upon execution to initiate the project.</div><div>· 50% balance ({fmt(balance)}) due upon system go-live.</div></div>
+      </div>
+      <div style={{ marginBottom: 16 }}>
+        <strong>Monthly Recurring — {fmt(totalMonthly)}/month:</strong>
+        <div style={{ paddingLeft: 16, marginTop: 4 }}><div>· First month billed on go-live date. Subsequent billing on same day each month.</div><div>· All-inclusive: hosting, cloud storage, API access, SMS/email, AI tokens, and maintenance.</div><div>· 30 days written notice required to cancel.</div></div>
+      </div>
+      <div style={{ marginBottom: 16 }}><strong>Accepted Payment Methods:</strong> ACH bank transfer, business check, or credit/debit card (3% processing fee applies to card payments).</div>
+      <div style={{ marginBottom: 16 }}><strong>Post-Launch Support:</strong> HD Connex provides a {supportDays}-day post-launch support window at no charge.</div>
+      <div><strong>Intellectual Property:</strong> All automation logic built under this Agreement are the property of HD Connex and licensed to Client for the duration of the active monthly service.</div>
+    </div>
+  );
+}
+
+function SigBlock({ label, title, sigData, onChange }) {
+  return (
+    <div>
+      <div style={{ borderBottom: "2px solid #2A2A3A", marginBottom: 8, height: 52 }}>
+        <input type="text" value={sigData} onChange={e => onChange(e.target.value)} placeholder="Type full legal name" style={{ width: "100%", height: 50, border: "none", background: "transparent", fontSize: 20, fontFamily: "'Georgia', serif", fontStyle: "italic", color: "#1A1A2E", outline: "none" }} />
+      </div>
+      <div style={{ fontSize: 13, fontWeight: 700 }}>{label}</div>
+      <div style={{ fontSize: 12, color: "#9090A0" }}>{title}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginTop: 22 }}>
+        {[["Printed Name", "Date"],["Title / Role", ""]].map((row, ri) => row.map((lbl, ci) => lbl ? <div key={ri + "-" + ci}><div style={{ borderBottom: "1px solid #CCCCCC", height: 36, marginBottom: 5 }}></div><div style={{ fontSize: 10.5, color: "#9090A0" }}>{lbl}</div></div> : <div key={ri + "-" + ci} />))}
+      </div>
+    </div>
+  );
+}
+
+function Contract({ bundleSelected, pkgs, addons, totalOneTime, totalMonthly, onBack }) {
+  const [providerSig, setProviderSig] = useState("");
+  const [clientSig, setClientSig] = useState("");
+  const [sent, setSent] = useState(false);
+  const selectedPackages = bundleSelected ? PACKAGES : PACKAGES.filter(p => pkgs.has(p.id));
+  const selectedAddons = ADDONS.filter(a => addons.has(a.id));
+  const timeline = getTimeline(bundleSelected, selectedPackages, selectedAddons);
+  const contractNum = `MA-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, "0")}${String(new Date().getDate()).padStart(2, "0")}`;
+
+  const handleSignAndSend = () => {
+    const subject = encodeURIComponent(`Signed: Service Agreement ${contractNum}`);
+    const body = encodeURIComponent(
+`SERVICE AGREEMENT #${contractNum}
+=====================================
+Date: ${TODAY}
+
+SERVICE PROVIDER: HD Connex
+CLIENT: Mason Avenue Gun & Pawn
+
+SELECTED SERVICES:
+${bundleSelected ? `• Full Platform Bundle: ${fmt(BUNDLE.oneTime)} one-time / ${fmt(BUNDLE.monthly)}/mo` : ""}
+${selectedPackages.map(p => `• ${p.name}: ${fmt(p.oneTime)} one-time / ${fmt(p.monthly)}/mo`).join("\n")}
+${selectedAddons.map(a => `• ${a.name} (Add-on): ${fmt(a.oneTime)} one-time / ${fmt(a.monthly)}/mo`).join("\n")}
+
+TOTAL: ${fmt(totalOneTime)} one-time / ${fmt(totalMonthly)}/mo
+
+SIGNATURES:
+Provider: ${providerSig || "[unsigned]"}
+Client: ${clientSig || "[unsigned]"}
+
+---
+This message was generated from the HD Connex Proposal System.
+Agreement ${contractNum} | ${TODAY}
+`
+    );
+    window.location.href = `mailto:contact@hdconnex.com?subject=${subject}&body=${body}`;
+    setSent(true);
+  };
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#EEECEA", fontFamily: "'Georgia', serif" }}>
+      <div data-print-hide style={{ background: "#0F0F1A", padding: "11px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, zIndex: 20 }}>
+        <button onClick={onBack} style={{ background: "transparent", border: "1px solid #3A3A5A", color: "#A0A0C0", padding: "7px 16px", borderRadius: 4, cursor: "pointer", fontSize: 12.5 }}>← Back to Builder</button>
+        <div style={{ color: "#8080A0", fontSize: 12, fontFamily: "monospace" }}>CONTRACT #{contractNum}</div>
+        <button onClick={() => window.print()} style={{ background: "#F97316", border: "none", color: "#fff", padding: "8px 22px", borderRadius: 4, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>Print / Save PDF</button>
+      </div>
+
+      <div style={{ maxWidth: 870, margin: "32px auto", background: "#FFFFFF", boxShadow: "0 4px 40px rgba(0,0,0,0.15)", padding: "56px 60px 72px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 36, paddingBottom: 22, borderBottom: "3px solid #F97316" }}>
+          <HDLogo dark={false} />
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 10, color: "#9090A0", letterSpacing: "0.14em", fontFamily: "monospace" }}>SERVICE AGREEMENT</div>
+            <div style={{ fontSize: 18, fontWeight: 800, color: "#1A1A2E", marginTop: 4 }}>#{contractNum}</div>
+            <div style={{ fontSize: 11.5, color: "#9090A0", marginTop: 4 }}>Issued: {TODAY}</div>
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 32 }}>
+          <div style={{ background: "#F9F8F5", padding: "18px 20px", borderRadius: 6 }}>
+            <div style={{ fontSize: 9.5, color: "#F97316", letterSpacing: "0.14em", marginBottom: 8, fontFamily: "monospace", fontWeight: 700 }}>SERVICE PROVIDER</div>
+            <div style={{ fontWeight: 700, fontSize: 15 }}>HD Connex</div>
+            <div style={{ fontSize: 12, color: "#6060A0", marginTop: 5, lineHeight: 1.7 }}>Cognitive Architecture & Intelligence<br />Daytona Beach, Florida<br />contact@hdconnex.com</div>
+          </div>
+          <div style={{ background: "#F9F8F5", padding: "18px 20px", borderRadius: 6 }}>
+            <div style={{ fontSize: 9.5, color: "#22D3EE", letterSpacing: "0.14em", marginBottom: 8, fontFamily: "monospace", fontWeight: 700 }}>CLIENT</div>
+            <div style={{ fontWeight: 700, fontSize: 15 }}>Mason Avenue Gun & Pawn</div>
+            <div style={{ fontSize: 12, color: "#6060A0", marginTop: 5, lineHeight: 1.7 }}>Daytona Beach, Florida<br />Federal Firearms Licensee (FFL)<br />Licensed Pawnbroker — Volusia County, FL</div>
+          </div>
+        </div>
+
+        <div style={{ padding: "18px 22px", borderLeft: "4px solid #F97316", background: "#FFF9F4", marginBottom: 36, borderRadius: "0 6px 6px 0" }}>
+          <p style={{ fontSize: 13, color: "#2A1A0A", lineHeight: 1.75, margin: 0 }}>This Service Agreement is entered into as of <strong>{TODAY}</strong> between HD Connex and Mason Avenue Gun & Pawn.</p>
+        </div>
+
+        <div style={{ marginBottom: 36 }}>
+          <SectionHeader>SECTION 1 — WEBSITE (PREVIOUSLY COMPLETED)</SectionHeader>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 24 }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 6 }}>Mason Avenue Gun & Pawn — Business Website</div>
+              <p style={{ fontSize: 12.5, color: "#5A5A72", lineHeight: 1.7, margin: "0 0 10px" }}>Professional business website — fully designed, developed, and delivered. Status: <strong style={{ color: "#27AE60" }}>COMPLETE & LIVE</strong>.</p>
+            </div>
+            <div style={{ textAlign: "right", flexShrink: 0, minWidth: 110 }}>
+              <div style={{ fontSize: 19, fontWeight: 700, color: "#F97316" }}>{fmt(WEBSITE.oneTime)}</div>
+              <div style={{ fontSize: 11, color: "#9090A0" }}>one-time</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#22D3EE", marginTop: 6 }}>{fmt(WEBSITE.monthly)}/mo</div>
+              <div style={{ fontSize: 11, color: "#9090A0" }}>maintenance</div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 36 }}>
+          <SectionHeader>SECTION 2 — AUTOMATION SERVICES SCOPE OF WORK</SectionHeader>
+          {bundleSelected && <div style={{ padding: "10px 16px", background: "#F0FFF8", border: "1px solid #27AE60", borderRadius: 6, marginBottom: 20, fontSize: 12.5, color: "#1A4A2A", fontWeight: 600 }}>★ Full Platform Bundle selected — all three automation suites at bundle pricing.</div>}
+          {selectedPackages.map((pkg, i) => <PackageContractSection key={pkg.id} pkg={pkg} num={i + 1} />)}
+          {selectedAddons.map((a, i) => <AddonContractSection key={a.id} addon={a} num={selectedPackages.length + i + 1} />)}
+        </div>
+
+        <div style={{ marginBottom: 36 }}>
+          <SectionHeader>SECTION 3 — IMPLEMENTATION TIMELINE</SectionHeader>
+          <div style={{ fontSize: 12.5, color: "#5A5A72", marginBottom: 16 }}>Estimated total implementation time: <strong>{timeline}</strong>.</div>
+          <ContractTimeline bundleSelected={bundleSelected} selectedPackages={selectedPackages} selectedAddons={selectedAddons} />
+        </div>
+
+        <div style={{ marginBottom: 36 }}>
+          <SectionHeader>SECTION 4 — INVESTMENT SUMMARY</SectionHeader>
+          <InvestmentTable bundleSelected={bundleSelected} selectedPackages={selectedPackages} selectedAddons={selectedAddons} totalOneTime={totalOneTime} totalMonthly={totalMonthly} />
+          <div style={{ background: "#F0FFF8", border: "1px solid #B8E8C8", borderRadius: 6, padding: "12px 18px", marginTop: 18 }}>
+            <div style={{ fontSize: 11, color: "#1A4A2A", fontWeight: 600 }}>✓ Monthly fees are all-inclusive. No surprise bills.</div>
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 36 }}>
+          <SectionHeader>SECTION 5 — PAYMENT TERMS & CONDITIONS</SectionHeader>
+          <PaymentTermsSection totalOneTime={totalOneTime} totalMonthly={totalMonthly} bundleSelected={bundleSelected} />
+        </div>
+
+        <div style={{ marginBottom: 48 }}>
+          <SectionHeader>SECTION 6 — AUTHORIZATION & SIGNATURES</SectionHeader>
+          <p style={{ fontSize: 12.5, color: "#5A5A72", marginBottom: 28, lineHeight: 1.7 }}>By signing below, both parties acknowledge that they have read, understood, and agree to the full scope of services outlined in this Agreement.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48 }}>
+            <SigBlock label="HD Connex" title="Service Provider" sigData={providerSig} onChange={setProviderSig} />
+            <SigBlock label="Mason Avenue Gun & Pawn" title="Client" sigData={clientSig} onChange={setClientSig} />
+          </div>
+          <div style={{ marginTop: 32, padding: "20px", background: "#F9F8F5", borderRadius: 8, textAlign: "center" }}>
+            {sent ? (
+              <div style={{ color: "#27AE60", fontWeight: 700, fontSize: 16 }}>✓ Email opened — please send to complete signature submission</div>
+            ) : (
+              <button onClick={handleSignAndSend} style={{ background: "#F97316", border: "none", color: "#fff", padding: "16px 40px", borderRadius: 6, cursor: "pointer", fontWeight: 800, fontSize: 15, fontFamily: "monospace" }}>
+                ✉ SIGN &amp; SEND VIA EMAIL
+              </button>
+            )}
+            <div style={{ marginTop: 12, fontSize: 11.5, color: "#9090A0" }}>Opens your email app to send the signed agreement to HD Connex</div>
+          </div>
+        </div>
+
+        <div style={{ borderTop: "2px solid #F97316", paddingTop: 22, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <HDLogo dark={false} />
+          <div style={{ fontSize: 11, color: "#9090A0", textAlign: "right", lineHeight: 1.75 }}>Daytona Beach, FL · hdconnex.com<br />contact@hdconnex.com<br />Agreement #{contractNum} · {TODAY}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [view, setView] = useState("form");
+  const [bundleSelected, setBundleSelected] = useState(false);
+  const [pkgs, setPkgs] = useState(new Set());
+  const [addons, setAddons] = useState(new Set());
+
+  const togglePkg = id => { if (bundleSelected) return; setPkgs(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; }); };
+  const toggleAddon = id => { setAddons(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; }); };
+  const toggleBundle = () => { setBundleSelected(v => { if (!v) setPkgs(new Set()); return !v; }); };
+
+  const { totalOneTime, totalMonthly } = useMemo(() => {
+    let ot = WEBSITE.oneTime, mo = WEBSITE.monthly;
+    if (bundleSelected) { ot += BUNDLE.oneTime; mo += BUNDLE.monthly; }
+    else PACKAGES.forEach(p => { if (pkgs.has(p.id)) { ot += p.oneTime; mo += p.monthly; } });
+    ADDONS.forEach(a => { if (addons.has(a.id)) { ot += a.oneTime; mo += a.monthly; } });
+    return { totalOneTime: ot, totalMonthly: mo };
+  }, [bundleSelected, pkgs, addons]);
+
+  const hasSelections = bundleSelected || pkgs.size > 0;
+
+  if (view === "contract") {
+    return <Contract bundleSelected={bundleSelected} pkgs={pkgs} addons={addons} totalOneTime={totalOneTime} totalMonthly={totalMonthly} onBack={() => setView("form")} />;
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#0A0A0F", color: "#F0F0F8", fontFamily: "'Georgia', serif" }}>
+      <div style={{ background: "linear-gradient(135deg, #0E0E1A 0%, #180E0A 100%)", borderBottom: "1px solid #2A2A3A", padding: "20px 28px", position: "sticky", top: 0, zIndex: 10 }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+          <div>
+            <HDLogo dark={true} />
+            <div style={{ fontSize: 12, color: "#8080A0", marginTop: 4 }}>Automation Proposal Builder — Mason Avenue Gun & Pawn</div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 10.5, color: "#8080A0", letterSpacing: "0.1em", fontFamily: "monospace" }}>RUNNING TOTAL</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: "#F97316" }}>{fmt(totalOneTime)}</div>
+            <div style={{ fontSize: 13, color: "#22D3EE" }}>+ {fmt(totalMonthly)}/mo</div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "32px 28px 130px" }}>
+        <div style={{ background: "#16161E", border: "1px solid #2A2A3A", borderRadius: 8, padding: "16px 22px", marginBottom: 36, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
+          <div>
+            <div style={{ fontSize: 10, color: "#F97316", letterSpacing: "0.12em", fontFamily: "monospace", marginBottom: 5, fontWeight: 700 }}>ALWAYS INCLUDED — NO TOGGLE NEEDED</div>
+            <div style={{ fontWeight: 600, fontSize: 15 }}>Business Website — Mason Avenue Gun & Pawn</div>
+            <div style={{ fontSize: 12.5, color: "#8080A0", marginTop: 3 }}>Already completed and live.</div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ color: "#F97316", fontWeight: 700, fontSize: 16 }}>{fmt(WEBSITE.oneTime)} <span style={{ fontSize: 12, color: "#8080A0" }}>one-time</span></div>
+            <div style={{ color: "#22D3EE", fontSize: 13, marginTop: 3 }}>{fmt(WEBSITE.monthly)}/mo maintenance</div>
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 40 }}>
+          <SectionLabel>▸ RECOMMENDED — FULL PLATFORM BUNDLE</SectionLabel>
+          <BundleCard selected={bundleSelected} onToggle={toggleBundle} />
+        </div>
+
+        <div style={{ marginBottom: 40 }}>
+          <SectionLabel>▸ INDIVIDUAL PACKAGES</SectionLabel>
+          {bundleSelected && <div style={{ padding: "10px 16px", background: "rgba(249,115,22,0.06)", border: "1px solid rgba(249,115,22,0.2)", borderRadius: 6, marginBottom: 14, fontSize: 12.5, color: "#F97316" }}>Bundle selected — individual packages are included.</div>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(310px, 1fr))", gap: 16 }}>
+            {PACKAGES.map(p => <PackageCard key={p.id} pkg={p} selected={pkgs.has(p.id) || bundleSelected} disabled={bundleSelected} onToggle={() => togglePkg(p.id)} />)}
+          </div>
+        </div>
+
+        <div style={{ marginBottom: 40 }}>
+          <SectionLabel>▸ ADD-ON SERVICES</SectionLabel>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+            {ADDONS.map(a => <AddonCard key={a.id} addon={a} selected={addons.has(a.id)} onToggle={() => toggleAddon(a.id)} />)}
+          </div>
+        </div>
+      </div>
+
+      <div data-print-hide style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(17,17,24,0.97)", borderTop: "1px solid #2A2A3A", padding: "14px 28px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
+        <div style={{ display: "flex", gap: 36, flexWrap: "wrap" }}>
+          <div><div style={{ fontSize: 9.5, color: "#8080A0", letterSpacing: "0.1em", fontFamily: "monospace" }}>ONE-TIME INVESTMENT</div><div style={{ fontSize: 26, fontWeight: 700, color: "#F97316" }}>{fmt(totalOneTime)}</div></div>
+          <div><div style={{ fontSize: 9.5, color: "#8080A0", letterSpacing: "0.1em", fontFamily: "monospace" }}>MONTHLY RECURRING</div><div style={{ fontSize: 26, fontWeight: 700, color: "#22D3EE" }}>{fmt(totalMonthly)}/mo</div></div>
+        </div>
+        <button onClick={() => hasSelections && setView("contract")} disabled={!hasSelections} style={{ background: hasSelections ? "#F97316" : "#2A2A3A", color: hasSelections ? "#0A0A0F" : "#6060A0", border: "none", padding: "14px 36px", borderRadius: 6, fontWeight: 800, fontSize: 14, cursor: hasSelections ? "pointer" : "not-allowed", fontFamily: "monospace" }}>GENERATE CONTRACT →</button>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
